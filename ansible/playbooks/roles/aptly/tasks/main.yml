@@ -1,0 +1,50 @@
+- name: 'Install packages'
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - docker.io
+    - docker-compose
+    - gnupg1
+
+- name: 'Create directory structures'
+  ansible.builtin.file:
+    path: '{{ item.name }}'
+    state: directory
+    mode: '{{ item.mode }}'
+  with_items:
+    - { name: '{{ aptly_workdir }}/docker/.gnupg/', mode: '0700' }
+    - { name: '{{ aptly_workdir }}/volume/public/', mode: '0755' }
+
+- name: 'Copy files'
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+    force: '{{ item.force }}'
+    owner: root
+    group: root
+  with_items:
+    - { src: 'Dockerfile', dest: '{{ aptly_workdir }}/docker/Dockerfile', mode: '0644', force: yes }
+    - { src: 'pubring.gpg', dest: '{{ aptly_workdir }}/docker/.gnupg/pubring.gpg', mode: '0644', force: yes }
+    - { src: 'secring.gpg', dest: '{{ aptly_workdir }}/docker/.gnupg/secring.gpg', mode: '0600', force: yes }
+    - { src: 'trustedkeys.gpg', dest: '{{ aptly_workdir }}/docker/.gnupg/trustedkeys.gpg', mode: '0644', force: no }
+    - { src: 'repo.key', dest: '{{ aptly_workdir }}/volume/public/repo.key', mode: '0644', force: yes }
+
+- name: 'Copy templates'
+  ansible.builtin.template: 
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - { src: 'aptly.conf', dest: '{{ aptly_workdir }}/docker/aptly.conf' }
+    - { src: 'nginx.conf', dest: '{{ aptly_workdir }}/docker/nginx.conf' }
+    - { src: 'docker-compose.yml', dest: '{{ aptly_workdir }}/docker/docker-compose.yml' }
+
+- name: 'Launch app'
+  community.docker.docker_compose:
+    project_src: '{{ aptly_workdir }}/docker/'
+    state: present
+    build: yes
