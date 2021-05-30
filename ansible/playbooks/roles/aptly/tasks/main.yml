@@ -10,8 +10,8 @@
 - name: 'Create directory structures'
   ansible.builtin.file:
     path: '{{ item.name }}'
-    state: directory
     mode: '{{ item.mode }}'
+    state: directory
   with_items:
     - { name: '{{ aptly_workdir }}/docker/.gnupg/', mode: '0700' }
     - { name: '{{ aptly_workdir }}/volume/public/', mode: '0755' }
@@ -35,16 +35,27 @@
   ansible.builtin.template: 
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
-    mode: 0644
+    mode: '{{ item.mode }}'
     owner: root
     group: root
   with_items:
-    - { src: 'aptly.conf', dest: '{{ aptly_workdir }}/docker/aptly.conf' }
-    - { src: 'nginx.conf', dest: '{{ aptly_workdir }}/docker/nginx.conf' }
-    - { src: 'docker-compose.yml', dest: '{{ aptly_workdir }}/docker/docker-compose.yml' }
+    - { src: 'aptly.conf', dest: '{{ aptly_workdir }}/docker/aptly.conf', mode: '0644' }
+    - { src: 'nginx.conf', dest: '{{ aptly_workdir }}/docker/nginx.conf', mode: '0644' }
+    - { src: 'docker-compose.yml', dest: '{{ aptly_workdir }}/docker/docker-compose.yml', mode: '0644' }
+    - { src: 'repo-bootstrap.sh', dest: '{{ aptly_workdir }}/volume/repo-bootstrap.sh', mode: '0754' }
+    - { src: 'meta-release', dest: '{{ aptly_workdir }}/volume/public/meta-release', mode: '0644' }
+    - { src: 'meta-release-lts', dest: '{{ aptly_workdir }}/volume/public/meta-release-lts', mode: '0644' }
 
 - name: 'Launch app'
   community.docker.docker_compose:
     project_src: '{{ aptly_workdir }}/docker/'
     state: present
     build: yes
+
+- name: 'Run bootstrap'
+  community.docker.docker_container_exec:
+    container: docker_aptly_1
+    command: /bin/bash -l -c {{ aptly_workdir }}/repo-bootstrap.sh > /var/log/repo-bootstrap.log
+  run_once: True
+  no_log: True
+  when: run_bootstrap == True

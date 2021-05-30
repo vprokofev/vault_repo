@@ -1,1 +1,3 @@
 aptly_workdir: '/srv/aptly'
+run_bootstrap: False
+repo_fqdn: 'example.domain'
