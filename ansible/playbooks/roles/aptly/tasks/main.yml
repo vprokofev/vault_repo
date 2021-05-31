@@ -55,7 +55,7 @@
 - name: 'Run bootstrap'
   community.docker.docker_container_exec:
     container: docker_aptly_1
-    command: /bin/bash -l -c {{ aptly_workdir }}/repo-bootstrap.sh > /var/log/repo-bootstrap.log
+    command: /bin/bash -l -c '{{ aptly_workdir }}/repo-bootstrap.sh > /var/log/repo-bootstrap.log'
   run_once: True
   no_log: True
   when: run_bootstrap == True
