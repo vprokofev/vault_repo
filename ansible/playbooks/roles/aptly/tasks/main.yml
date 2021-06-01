@@ -1,11 +1,20 @@
-- name: 'Install packages'
+- name: 'Install apt packages'
   ansible.builtin.apt:
     name: '{{ item }}'
     state: latest
   with_items:
     - docker.io
-    - docker-compose
     - gnupg1
+    - python3-pip
+
+- name: 'Install pip packages'
+  ansible.builtin.pip:
+    name: '{{ item }}'
+    extra_args: '--upgrade'
+  with_items:
+    - pip
+    - docker
+    - docker-compose
 
 - name: 'Create directory structures'
   ansible.builtin.file:
