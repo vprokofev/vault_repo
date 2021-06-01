@@ -5,7 +5,7 @@ aptly + ansible + docker
 Running this playbook will create an aptly deployment inside docker container with nginx for published repos.
 
 # Requirements.
-Ubuntu 20.04 LTS \
+Ubuntu 18.04 LTS or 20.04 LTS \
 ansible >= 2.10 \
 ansible-galaxy collection install community.docker
 
