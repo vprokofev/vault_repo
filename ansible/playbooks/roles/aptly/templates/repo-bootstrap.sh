@@ -173,7 +173,7 @@ $APTLY_PUBLISH_SNAPSHOT $OPENSTACK_STEIN_BIONIC/$APTLY_SNAPSHOT_SUFFIX openstack
 $APTLY_PUBLISH_SNAPSHOT $OPENSTACK_TRAIN_BIONIC/$APTLY_SNAPSHOT_SUFFIX openstack
 $APTLY_PUBLISH_SNAPSHOT $OPENSTACK_USSURI_BIONIC/$APTLY_SNAPSHOT_SUFFIX openstack
 $APTLY_PUBLISH_SNAPSHOT $OPENSTACK_VICTORIA_FOCAL/$APTLY_SNAPSHOT_SUFFIX openstack
-$APTLY_PUBLISH_SNAPSHOT $OPENSTACK_VICTORIA_FOCAL/$APTLY_SNAPSHOT_SUFFIX openstack
+$APTLY_PUBLISH_SNAPSHOT $OPENSTACK_WALLABY_FOCAL/$APTLY_SNAPSHOT_SUFFIX openstack
 
 wget -r -np -nH --cut-dirs=5 -P {{ aptly_workdir }}/public/upgrade/focal/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/focal-updates/main/dist-upgrader-all/
 wget -r -np -nH --cut-dirs=5 -P {{ aptly_workdir }}/public/upgrade/bionic/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/bionic-updates/main/dist-upgrader-all/
