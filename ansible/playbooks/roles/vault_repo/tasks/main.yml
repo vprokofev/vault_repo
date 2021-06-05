@@ -1,0 +1,84 @@
+- name: 'Install apt packages'
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - docker.io
+    - python3-pip
+
+- name: 'Install pip packages'
+  ansible.builtin.pip:
+    name: '{{ item }}'
+    extra_args: '--upgrade'
+  with_items:
+    - pip
+    - docker
+    - docker-compose
+
+- name: 'Create directory structures'
+  ansible.builtin.file:
+    path: '{{ item.name }}'
+    mode: '{{ item.mode }}'
+    state: directory
+  with_items:
+    - { name: '{{ vault_repo_workdir }}/nginx/docker/', mode: '0755' }
+    - { name: '{{ vault_repo_workdir }}/docker/', mode: '0755' }
+    - { name: '{{ vault_repo_workdir }}/aptly/docker/', mode: '0755' }
+    - { name: '{{ vault_repo_workdir }}/aptly/docker/.gnupg/', mode: '0700' }
+    - { name: '{{ vault_repo_workdir }}/aptly/volume/public/', mode: '0755' }
+    - { name: '{{ vault_repo_workdir }}/bandersnatch/pypi/', mode: '0755' }
+    - { name: '{{ vault_repo_workdir }}/bandersnatch/docker/', mode: '0755' }
+
+- name: 'Copy files'
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+    force: '{{ item.force }}'
+    owner: root
+    group: root
+  with_items:
+    - { src: 'Dockerfile', dest: '{{ vault_repo_workdir }}/docker/Dockerfile', mode: '0644', force: yes }
+    - { src: 'pubring.gpg', dest: '{{ vault_repo_workdir }}/aptly/docker/.gnupg/pubring.gpg', mode: '0644', force: yes }
+    - { src: 'secring.gpg', dest: '{{ vault_repo_workdir }}/aptly/docker/.gnupg/secring.gpg', mode: '0600', force: yes }
+    - { src: 'trustedkeys.gpg', dest: '{{ vault_repo_workdir }}/aptly/docker/.gnupg/trustedkeys.gpg', mode: '0644', force: no }
+    - { src: 'repo.key', dest: '{{ vault_repo_workdir }}/aptly/volume/public/repo.key', mode: '0644', force: yes }
+
+- name: 'Copy templates'
+  ansible.builtin.template: 
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+    owner: root
+    group: root
+  with_items:
+    - { src: 'aptly.conf', dest: '{{ vault_repo_workdir }}/aptly/docker/aptly.conf', mode: '0644' }
+    - { src: 'nginx.conf', dest: '{{ vault_repo_workdir }}/nginx/docker/nginx.conf', mode: '0644' }
+    - { src: 'docker-compose.yml', dest: '{{ vault_repo_workdir }}/docker/docker-compose.yml', mode: '0644' }
+    - { src: 'repo-bootstrap.sample.sh', dest: '{{ vault_repo_workdir }}/aptly/volume/repo-bootstrap.sample.sh', mode: '0754' }
+    - { src: 'repo-bootstrap.sh', dest: '{{ vault_repo_workdir }}/aptly/volume/repo-bootstrap.sh', mode: '0754' }
+    - { src: 'meta-release', dest: '{{ vault_repo_workdir }}/aptly/volume/public/meta-release', mode: '0644' }
+    - { src: 'meta-release-lts', dest: '{{ vault_repo_workdir }}/aptly/volume/public/meta-release-lts', mode: '0644' }
+    - { src: 'bandersnatch.conf', dest: '{{ vault_repo_workdir }}/bandersnatch/docker/bandersnatch.conf', mode: '0644' }
+
+- name: 'Launch app'
+  community.docker.docker_compose:
+    project_src: '{{ vault_repo_workdir }}/docker/'
+    state: present
+    build: yes
+
+- name: 'Run bootstrap sample'
+  community.docker.docker_container_exec:
+    container: docker_aptly_1
+    command: /bin/bash -c '{{ vault_repo_workdir }}/repo-bootstrap.sample.sh > {{ vault_repo_workdir }}/repo-bootstrap.log'
+  run_once: True
+  no_log: False
+  when: run_bootstrap_sample == True
+
+- name: 'Run bootstrap'
+  community.docker.docker_container_exec:
+    container: docker_aptly_1
+    command: /bin/bash -c '{{ vault_repo_workdir }}/repo-bootstrap.sh > {{ vault_repo_workdir }}/repo-bootstrap.log'
+  run_once: True
+  no_log: True
+  when: run_bootstrap == True

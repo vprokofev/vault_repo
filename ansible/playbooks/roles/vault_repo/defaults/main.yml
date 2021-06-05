@@ -1,5 +1,5 @@
 # aptly workdir inside container and on the host.
-aptly_workdir: '/srv/aptly'
+vault_repo_workdir: '/srv/vault_repo'
 
 # Runs repo-bootstrap.sh which populates a huge number of packages.
 # WARNING!!! It will download about 770GB of packages!
@@ -7,7 +7,7 @@ run_bootstrap: False
 
 # Runs repo-bootstrap.sample.sh which populates a small number of packages.
 # Good for testing things out. Only downloads about 400MB.
-run_bootstrap_sample: False
+run_bootstrap_sample: True
 
 # Your hosts FQDN which you will use to point apt clients to.
 repo_fqdn: 'example.domain'

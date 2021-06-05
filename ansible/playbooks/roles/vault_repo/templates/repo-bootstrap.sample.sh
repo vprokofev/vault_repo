@@ -55,6 +55,6 @@ $APTLY_SNAPSHOT_CREATE $OPENSTACK_WALLABY_FOCAL/$APTLY_SNAPSHOT_SUFFIX from mirr
 
 $APTLY_PUBLISH_SNAPSHOT $OPENSTACK_WALLABY_FOCAL/$APTLY_SNAPSHOT_SUFFIX openstack
 
-wget -r -np -nH --cut-dirs=5 -P {{ aptly_workdir }}/public/upgrade/focal/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/focal-updates/main/dist-upgrader-all/
-wget -r -np -nH --cut-dirs=5 -P {{ aptly_workdir }}/public/upgrade/bionic/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/bionic-updates/main/dist-upgrader-all/
-wget -r -np -nH --cut-dirs=5 -P {{ aptly_workdir }}/public/upgrade/xenial/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/xenial-updates/main/dist-upgrader-all/
+wget -r -np -nH --cut-dirs=5 -P {{ vault_repo_workdir }}/public/upgrade/focal/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/focal-updates/main/dist-upgrader-all/
+wget -r -np -nH --cut-dirs=5 -P {{ vault_repo_workdir }}/public/upgrade/bionic/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/bionic-updates/main/dist-upgrader-all/
+wget -r -np -nH --cut-dirs=5 -P {{ vault_repo_workdir }}/public/upgrade/xenial/ -R index.html* $ARCHIVE_UBUNTU_COM/dists/xenial-updates/main/dist-upgrader-all/

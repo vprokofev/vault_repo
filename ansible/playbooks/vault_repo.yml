@@ -1,0 +1,4 @@
+- hosts: vault_repo
+  roles:
+  - vault_repo
+  become: yes

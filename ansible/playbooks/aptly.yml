@@ -1,4 +1,0 @@
-- hosts: aptly
-  roles:
-  - aptly
-  become: yes
