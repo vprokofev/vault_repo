@@ -1,3 +1,0 @@
-/ansible/playbooks/roles/vault_repo/files/pubring.gpg
-/ansible/playbooks/roles/vault_repo/files/secring.gpg
-/ansible/playbooks/roles/vault_repo/files/repo.key

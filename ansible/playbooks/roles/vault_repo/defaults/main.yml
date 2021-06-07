@@ -1,13 +1,45 @@
-# aptly workdir inside container and on the host.
-vault_repo_workdir: '/srv/vault_repo'
+# repository storage, supposed to be a CephFS mount
+repo_workdir: '/srv/repo'
 
-# Runs repo-bootstrap.sh which populates a huge number of packages.
-# WARNING!!! It will download about 770GB of packages!
-run_bootstrap: False
+# base repositories URLs
+repo_url:
+  ubuntu_repo: 'http://au.archive.ubuntu.com/ubuntu/'
+  openstack_repo: 'http://ubuntu-cloud.archive.canonical.com/ubuntu/'
+  ceph_repo: 'https://au.ceph.com/'
 
-# Runs repo-bootstrap.sample.sh which populates a small number of packages.
-# Good for testing things out. Only downloads about 400MB.
-run_bootstrap_sample: True
+# repositories to mirror
+repo_list:
+  - 'deb {{ repo_url.ubuntu_repo }} focal main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} focal-updates main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} focal-security main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} focal-backports main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} bionic main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} bionic-updates main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} bionic-security main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} bionic-backports main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} xenial main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} xenial-updates main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} xenial-security main restricted universe multiverse'
+  - 'deb {{ repo_url.ubuntu_repo }} xenial-backports main restricted universe multiverse'
+  - 'deb {{ repo_url.openstack_repo }} focal-updates/wallaby main'
+  - 'deb {{ repo_url.openstack_repo }} focal-updates/victoria main'
+  - 'deb {{ repo_url.openstack_repo }} bionic-updates/ussuri main'
+  - 'deb {{ repo_url.openstack_repo }} bionic-updates/train main'
+  - 'deb {{ repo_url.openstack_repo }} bionic-updates/stein main'
+  - 'deb {{ repo_url.openstack_repo }} bionic-updates/rocky main'
+  - 'deb {{ repo_url.openstack_repo }} xenial-updates/queens main'
+  - 'deb {{ repo_url.openstack_repo }} xenial-updates/pike main'
+  - 'deb {{ repo_url.openstack_repo }} xenial-updates/ocata main'
+  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ focal main'
+  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ bionic main'
+  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ xenial main'
+  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ focal main'
+  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ bionic main'
+  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ xenial main'
+  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ bionic main'
+  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ xenial main'
+  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ bionic main'
+  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ xenial main'
 
-# Your hosts FQDN which you will use to point apt clients to.
-repo_fqdn: 'example.domain'
+# set to True for first run to populate and publish all repositories
+init: True

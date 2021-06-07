@@ -1,0 +1,23 @@
+############# config ##################
+#
+# set base_path    /var/spool/apt-mirror
+#
+# set mirror_path  $base_path/mirror
+# set skel_path    $base_path/skel
+# set var_path     $base_path/var
+set cleanscript /scripts/clean.sh
+set defaultarch  amd64
+set postmirror_script /scripts/postmirror.sh
+# set run_postmirror 0
+set nthreads     20
+set _tilde 0
+#
+############# end config ##############
+
+{% for repo in repo_list %}
+{{ repo }}
+{% endfor %}
+
+{% for repo in repo_url %}
+clean {{ repo_url[repo] }}
+{% endfor %}

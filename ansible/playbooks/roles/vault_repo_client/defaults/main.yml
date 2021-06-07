@@ -1,2 +1,0 @@
-# Your hosts FQDN which you will use to point apt clients to.
-repo_fqdn: 'example.domain'
