@@ -31,6 +31,7 @@
   loop:
     - { src: 'Dockerfile', dest: '{{ repo_workdir }}/docker/Dockerfile' }
     - { src: 'mirror.list', dest: '{{ repo_workdir }}/docker/mirror.list' }
+    - { src: 'postmirror.sh', dest: '{{ repo_workdir }}/docker/postmirror.sh' }
 
 - name: 'Build apt-mirror container'
   community.docker.docker_image:
@@ -45,7 +46,6 @@
     image: apt-mirror
     command: apt-mirror
     recreate: yes
-#    interactive: yes
     detach: no
     container_default_behavior: no_defaults
     restart_policy: no
@@ -53,6 +53,15 @@
       - '{{ repo_workdir }}/deb:/var/spool/apt-mirror/:z'
       - '{{ repo_workdir }}/docker/mirror.list:/etc/apt/mirror.list:ro'
   run_once: True
+  when: init
+
+- name: 'Copy more templates'
+  ansible.builtin.template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  loop:
+    - { src: 'meta-release', dest: '{{ repo_workdir }}/deb/mirror/{{ repo_url.ubuntu_repo | urlsplit("hostname") }}/meta-release' }
+    - { src: 'meta-release-lts', dest: '{{ repo_workdir }}/deb/mirror/{{ repo_url.ubuntu_repo | urlsplit("hostname") }}/meta-release-lts' }
   when: init
 
 - name: 'List created directories'
@@ -63,7 +72,7 @@
 
 - name: 'Create snapshot for each repository'
   ansible.builtin.file:
-    path: '{{ repo_workdir }}/deb/mirror/{{ item }}/.snap/{{ ansible_date_time.date }}'
+    path: '{{ repo_workdir }}/deb/mirror/{{ item }}/.snap/stable/'
     state: directory
   loop: '{{ deb_directories.stdout_lines }}'
   when: init

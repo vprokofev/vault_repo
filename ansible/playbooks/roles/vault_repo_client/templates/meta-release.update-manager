@@ -1,0 +1,7 @@
+# default location for the meta-release file
+
+[METARELEASE]
+URI = http://{{ repo_fqdn }}/deb/ubuntu/stable/meta-release
+URI_LTS = http://{{ repo_fqdn }}/deb/ubuntu/stable/meta-release-lts
+URI_UNSTABLE_POSTFIX = -development
+URI_PROPOSED_POSTFIX = -proposed

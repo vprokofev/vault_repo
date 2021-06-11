@@ -1,0 +1,8 @@
+- name: 'Copy templates'
+  ansible.builtin.template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    backup: yes
+  loop:
+    - { src: 'sources.list', dest: '/etc/apt/sources.list' }
+    - { src: 'meta-release.update-manager', dest: '/etc/update-manager/meta-release' }

@@ -1,19 +1,11 @@
-# repository storage, supposed to be a CephFS mount
-repo_workdir: '/srv/repo'
+repo_fqdn: vladvm
 
-# repository FQDN
-repo_fqdn: '{{ ansible_fqdn }}'
-
-# rsync repository
-rsync_repo_url: 'rsync://archive.ubuntu.com'
-
-# base repositories URLs
 repo_url:
-  ubuntu_repo: 'http://au.archive.ubuntu.com/ubuntu/'
-  openstack_repo: 'http://ubuntu-cloud.archive.canonical.com/ubuntu/'
-  ceph_repo: 'https://au.ceph.com/'
+  ubuntu_repo: 'http://vladvm/deb/ubuntu/stable/ubuntu/'
+  openstack_repo: 'http://vladvm/deb/openstack/stable/ubuntu/'
+  #  ceph_repo: '
 
-# repositories to mirror
+
 repo_list:
   - 'deb {{ repo_url.ubuntu_repo }} focal main restricted universe multiverse'
   - 'deb {{ repo_url.ubuntu_repo }} focal-updates main restricted universe multiverse'
@@ -36,16 +28,13 @@ repo_list:
   - 'deb {{ repo_url.openstack_repo }} xenial-updates/queens main'
   - 'deb {{ repo_url.openstack_repo }} xenial-updates/pike main'
   - 'deb {{ repo_url.openstack_repo }} xenial-updates/ocata main'
-  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ focal main'
-  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ bionic main'
-  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ xenial main'
-  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ focal main'
-  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ bionic main'
-  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ xenial main'
-  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ bionic main'
-  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ xenial main'
-  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ bionic main'
-  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ xenial main'
-
-# set to True for first run to populate and publish all repositories
-init: True
+    #  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ focal main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ bionic main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-pacific/ xenial main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ focal main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ bionic main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-nautilus/ xenial main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ bionic main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-luminous/ xenial main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ bionic main'
+    #  - 'deb {{ repo_url.ceph_repo }}debian-jewel/ xenial main'

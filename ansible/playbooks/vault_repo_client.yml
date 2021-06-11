@@ -1,0 +1,4 @@
+- hosts: vault_repo_client
+  roles:
+  - vault_repo_client
+  become: yes
