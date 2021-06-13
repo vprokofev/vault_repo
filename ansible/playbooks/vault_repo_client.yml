@@ -2,3 +2,4 @@
   roles:
   - vault_repo_client
   become: yes
+  vars_files: defaults/config.yml

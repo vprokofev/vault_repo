@@ -6,3 +6,4 @@
   loop:
     - { src: 'sources.list', dest: '/etc/apt/sources.list' }
     - { src: 'meta-release.update-manager', dest: '/etc/update-manager/meta-release' }
+    - { src: 'pip.conf', dest: '/etc/pip.conf' }

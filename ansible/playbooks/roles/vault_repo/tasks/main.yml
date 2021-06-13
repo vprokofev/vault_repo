@@ -21,6 +21,9 @@
   loop:
     - '{{ repo_workdir }}'
     - '{{ repo_workdir }}/deb'
+    - '{{ repo_workdir }}/deb/ceph'
+    - '{{ repo_workdir }}/deb/ubuntu'
+    - '{{ repo_workdir }}/deb/openstack'
     - '{{ repo_workdir }}/pypi'
     - '{{ repo_workdir }}/docker'
 
@@ -28,72 +31,61 @@
   ansible.builtin.template:
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
   loop:
-    - { src: 'Dockerfile', dest: '{{ repo_workdir }}/docker/Dockerfile' }
-    - { src: 'mirror.list', dest: '{{ repo_workdir }}/docker/mirror.list' }
-    - { src: 'postmirror.sh', dest: '{{ repo_workdir }}/docker/postmirror.sh' }
+    - { src: 'Dockerfile', dest: '{{ repo_workdir }}/docker/Dockerfile', mode: '0644' }
+    - { src: 'rsync_mirror.sh', dest: '{{ repo_workdir }}/docker/rsync_mirror.sh', mode: '0755' }
+    - { src: 'meta-release', dest: '{{ repo_workdir }}/deb/ubuntu/meta-release', mode: '0644' }
+    - { src: 'meta-release-lts', dest: '{{ repo_workdir }}/deb/ubuntu/meta-release-lts', mode: '0644' }
+    - { src: 'nginx.conf', dest: '{{ repo_workdir }}/docker/nginx.conf', mode: '0644' }
+    - { src: 'bandersnatch.conf', dest: '{{ repo_workdir }}/docker/bandersnatch.conf', mode: '0644' }
 
-- name: 'Build apt-mirror container'
+- name: 'Build rsync container'
   community.docker.docker_image:
-    name: apt-mirror
+    name: rsync
     build:
       path: '{{ repo_workdir }}/docker/'
     source: build
 
-- name: 'Run init apt-mirror container'
+- name: 'Run init rsync container'
   community.docker.docker_container:
-    name: repo-apt-mirror
-    image: apt-mirror
-    command: apt-mirror
+    name: repo-rsync
+    image: rsync
+    command: '/bin/bash /rsync_mirror.sh'
     recreate: yes
     detach: no
     container_default_behavior: no_defaults
     restart_policy: no
     volumes:
-      - '{{ repo_workdir }}/deb:/var/spool/apt-mirror/:z'
-      - '{{ repo_workdir }}/docker/mirror.list:/etc/apt/mirror.list:ro'
+      - '{{ repo_workdir }}/deb/:{{ repo_workdir }}/deb/:z'
+      - '{{ repo_workdir }}/docker/rsync_mirror.sh:/rsync_mirror.sh:ro'
   run_once: True
   when: init
 
-- name: 'Copy more templates'
-  ansible.builtin.template:
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
-  loop:
-    - { src: 'meta-release', dest: '{{ repo_workdir }}/deb/mirror/{{ repo_url.ubuntu_repo | urlsplit("hostname") }}/meta-release' }
-    - { src: 'meta-release-lts', dest: '{{ repo_workdir }}/deb/mirror/{{ repo_url.ubuntu_repo | urlsplit("hostname") }}/meta-release-lts' }
-  when: init
-
-- name: 'List created directories'
-  ansible.builtin.shell:
-    cmd: 'ls {{ repo_workdir }}/deb/mirror/'
-  register: deb_directories
-  when: init
-
-- name: 'Create snapshot for each repository'
-  ansible.builtin.file:
-    path: '{{ repo_workdir }}/deb/mirror/{{ item }}/.snap/stable/'
-    state: directory
-  loop: '{{ deb_directories.stdout_lines }}'
-  when: init
-
-- name: 'Run updater apt-mirror container'
+- name: 'Run init bandersnatch container'
   community.docker.docker_container:
-    name: repo-apt-mirror
-    image: apt-mirror
+    name: repo-bandersnatch
+    image: pypa/bandersnatch
+    command: bandersnatch mirror
+    detach: no
     recreate: yes
     container_default_behavior: no_defaults
     restart_policy: unless-stopped
     volumes:
-      - '{{ repo_workdir }}/deb:/var/spool/apt-mirror/:z'
-      - '{{ repo_workdir }}/docker/mirror.list:/etc/apt/mirror.list:ro'
-  run_once: True
-  when: not init
+      - '{{ repo_workdir }}/pypi/:{{ repo_workdir }}/pypi/:z'
+      - '{{ repo_workdir }}/docker/bandersnatch.conf:/etc/bandersnatch.conf:ro'
+  when: init
 
-- name: 'Prepare nginx.conf'
-  ansible.builtin.template:
-    src: nginx.conf
-    dest: '{{ repo_workdir }}/docker/nginx.conf'
+- name: 'Create initial snapshot for each repository'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+      - '{{ repo_workdir }}/deb/ubuntu/.snap/{{ ansible_date_time.date }}/'
+      - '{{ repo_workdir }}/deb/openstack/ubuntu/.snap/{{ ansible_date_time.date }}/'
+      - '{{ repo_workdir }}/deb/ceph/.snap/{{ ansible_date_time.date }}/'
+      - '{{ repo_workdir }}/pypi/web/.snap/{{ ansible_date_time.date }}/'
+  when: init
 
 - name: 'Run nginx container'
   community.docker.docker_container:
