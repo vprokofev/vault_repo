@@ -6,6 +6,7 @@ Running this playbook will download and publish full Ubuntu, Openstack, CEPH: Je
 
 # Requirements.
 Ubuntu 18.04 LTS or 20.04 LTS on repository nodes.\
+CephFS directory at repo_workdir on repository nodes. \
 ansible >= 2.10 \
 ansible-galaxy collection install community.docker
 
