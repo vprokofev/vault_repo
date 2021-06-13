@@ -74,6 +74,7 @@
     volumes:
       - '{{ repo_workdir }}/pypi/:{{ repo_workdir }}/pypi/:z'
       - '{{ repo_workdir }}/docker/bandersnatch.conf:/etc/bandersnatch.conf:ro'
+  run_once: True
   when: init
 
 - name: 'Create initial snapshot for each repository'
@@ -85,6 +86,7 @@
       - '{{ repo_workdir }}/deb/openstack/ubuntu/.snap/{{ ansible_date_time.date }}/'
       - '{{ repo_workdir }}/deb/ceph/.snap/{{ ansible_date_time.date }}/'
       - '{{ repo_workdir }}/pypi/web/.snap/{{ ansible_date_time.date }}/'
+  run_once: True
   when: init
 
 - name: 'Run nginx container'
